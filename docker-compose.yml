@@ -1,0 +1,38 @@
+services:
+  db:
+    container_name: paymentdb
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: paymentdb
+    ports:
+      - 5432:5432
+
+  payment-service:
+    container_name: payment-service
+    image: kamil94131/payment-service
+    build:
+      context: payment-service
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/paymentdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      URL: db
+    ports:
+      - 8081:8081
+    depends_on:
+      - db
+
+  book-service:
+    container_name: book-service
+    image: kamil94131/book-service
+    build:
+      context: book-service
+      dockerfile: Dockerfile
+    ports:
+      - 8082:8082
+    depends_on:
+      - db
